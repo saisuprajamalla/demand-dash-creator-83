@@ -2,36 +2,26 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, LineChart, Download, AlertTriangle } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, RefreshCw, LineChart, Download, BarChart3, Sparkles } from 'lucide-react';
 import GlassMorphCard from '../ui/GlassMorphCard';
 import ProgressIndicator from '../ui/ProgressIndicator';
-import { pageTransition } from '@/utils/transitions';
+import { staggerContainer, staggerItem } from '@/utils/transitions';
+import AIAnnotation from '@/components/ui/AIAnnotation';
 
 const steps = ["Onboarding", "Data Source", "Model Selection", "Forecast Setup", "Constraints", "Dashboard"];
 
-// Sample forecast data
-const sampleForecastData = [
-  { sku: 'ALX-001', name: 'Men\'s Basic Tee', forecast: 215, confidence: '±35', stockout: 'None', suggested: 250 },
-  { sku: 'ALX-002', name: 'Women\'s V-Neck Tee', forecast: 340, confidence: '±42', stockout: 'July 15', suggested: 400 },
-  { sku: 'ALX-003', name: 'Slim Fit Jeans', forecast: 120, confidence: '±18', stockout: 'None', suggested: 130 },
-  { sku: 'ALX-004', name: 'Hooded Sweatshirt', forecast: 85, confidence: '±12', stockout: 'None', suggested: 100 },
-  { sku: 'ALX-005', name: 'Casual Shorts', forecast: 175, confidence: '±28', stockout: 'July 22', suggested: 210 },
-];
-
 const ForecastSetupScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [horizonDays, setHorizonDays] = useState<number>(30);
-  const [customRange, setCustomRange] = useState(false);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [forecastGenerated, setForecastGenerated] = useState(false);
+  const [horizon, setHorizon] = useState('30');
+  const [isLoading, setIsLoading] = useState(false);
+  const [forecastReady, setForecastReady] = useState(false);
   
-  const handleGenerateForecast = () => {
-    setIsGenerating(true);
+  const handleForecastGenerate = () => {
+    setIsLoading(true);
+    // Simulate forecast generation
     setTimeout(() => {
-      setIsGenerating(false);
-      setForecastGenerated(true);
+      setIsLoading(false);
+      setForecastReady(true);
     }, 3000);
   };
   
@@ -43,96 +33,75 @@ const ForecastSetupScreen: React.FC = () => {
     navigate('/constraints');
   };
 
+  // Sample forecast data
+  const forecastData = [
+    { sku: 'SHIRT-001', product: 'Men\'s T-Shirt', forecast: 124, lower: 112, upper: 136, confidence: 'High' },
+    { sku: 'DRESS-102', product: 'Summer Dress', forecast: 87, lower: 76, upper: 98, confidence: 'Medium' },
+    { sku: 'SHOE-153', product: 'Running Shoes', forecast: 56, lower: 42, upper: 71, confidence: 'Low' },
+    { sku: 'BAG-022', product: 'Tote Bag', forecast: 103, lower: 94, upper: 112, confidence: 'High' },
+    { sku: 'HAT-034', product: 'Baseball Cap', forecast: 67, lower: 59, upper: 75, confidence: 'Medium' },
+  ];
+
   return (
-    <motion.div 
-      className="container max-w-5xl px-4 py-12 mx-auto"
-      {...pageTransition}
-    >
+    <div className="max-w-full mx-auto">
       <ProgressIndicator steps={steps} currentStep={3} />
       
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Demand Forecast Setup</h1>
-        <p className="text-lg text-gray-600">Configure your forecast horizon and generate predictions.</p>
-      </div>
+      <motion.div 
+        className="mb-6 text-center"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Forecast Setup</h1>
+        <p className="text-gray-600">Define your forecast horizon and generate predictions.</p>
+      </motion.div>
       
-      <GlassMorphCard className="mb-8" hover={false}>
-        <h2 className="text-xl font-semibold mb-6">Forecast Horizon</h2>
+      <GlassMorphCard className="mb-6" hover={false}>
+        <h2 className="text-lg font-medium mb-4">Forecast Horizon</h2>
         
-        <div className="mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
-            {[30, 60, 90, 180].map((days) => (
-              <button
-                key={days}
-                className={`p-4 rounded-lg border transition-all ${
-                  !customRange && horizonDays === days 
-                    ? 'border-primary bg-primary/5'
-                    : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'
-                } flex flex-col items-center`}
-                onClick={() => {
-                  setHorizonDays(days);
-                  setCustomRange(false);
-                }}
-              >
-                <span className="text-lg font-semibold">{days}</span>
-                <span className="text-sm text-gray-600">Days</span>
-              </button>
-            ))}
-          </div>
-          
-          <div className="flex items-center space-x-2 mb-4">
-            <div className={`w-5 h-5 rounded-full border cursor-pointer ${
-              customRange ? 'border-primary' : 'border-gray-300'
-            } flex items-center justify-center`}
-            onClick={() => setCustomRange(true)}>
-              {customRange && <div className="w-3 h-3 rounded-full bg-primary" />}
-            </div>
-            <span className="text-sm font-medium" onClick={() => setCustomRange(true)}>Custom Range</span>
-          </div>
-          
-          {customRange && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                <div className="relative">
-                  <Calendar size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                <div className="relative">
-                  <Calendar size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {['30', '60', '90', '180'].map((days) => (
+            <button
+              key={days}
+              className={`py-2 px-3 rounded-lg border transition-all flex flex-col items-center ${
+                horizon === days 
+                  ? 'border-primary bg-primary/5 text-primary'
+                  : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50 text-gray-600'
+              }`}
+              onClick={() => setHorizon(days)}
+            >
+              <span className="text-lg font-medium">{days}</span>
+              <span className="text-xs">Days</span>
+            </button>
+          ))}
         </div>
         
-        <div className="flex justify-center">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`btn-primary flex items-center ${isGenerating ? 'opacity-80' : ''}`}
-            onClick={handleGenerateForecast}
-            disabled={isGenerating}
+        <div className="mb-4">
+          <div className="flex items-center">
+            <Calendar size={18} className="text-gray-500 mr-2" />
+            <span className="text-sm font-medium">Custom Range</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">From</label>
+              <input type="date" className="w-full p-1.5 text-sm border border-gray-300 rounded" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">To</label>
+              <input type="date" className="w-full p-1.5 text-sm border border-gray-300 rounded" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex justify-end">
+          <button 
+            className={`inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            onClick={handleForecastGenerate}
+            disabled={isLoading}
           >
-            {isGenerating ? (
+            {isLoading ? (
               <>
-                <div className="animate-spin mr-2">
-                  <LineChart size={20} />
-                </div>
+                <RefreshCw size={18} className="mr-2 animate-spin" />
                 Generating Forecast...
               </>
             ) : (
@@ -141,80 +110,124 @@ const ForecastSetupScreen: React.FC = () => {
                 Generate Forecast
               </>
             )}
-          </motion.button>
+          </button>
         </div>
-        
-        {isGenerating && (
-          <div className="mt-6">
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-              <div className="bg-primary h-2 rounded-full animate-shimmer bg-gradient-to-r from-blue-500 via-primary to-blue-500 background-size-200" style={{ width: '70%' }}></div>
-            </div>
-            <div className="text-center text-sm text-gray-600">Processing data and generating forecast...</div>
-          </div>
-        )}
       </GlassMorphCard>
       
-      {forecastGenerated && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="bg-white rounded-xl p-6 shadow-sm mb-8 border border-gray-100">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Forecast Results</h2>
-              <button className="text-primary flex items-center text-sm font-medium">
-                <Download size={16} className="mr-1" />
-                Export to CSV
-              </button>
+      {isLoading && (
+        <div className="mb-6">
+          <GlassMorphCard hover={false}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Generating Forecast</h3>
+              <div className="flex items-center">
+                <RefreshCw size={16} className="text-primary animate-spin mr-2" />
+                <span className="text-sm text-gray-600">Processing...</span>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Analyzing historical patterns</span>
+                  <span>Done</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full" style={{ width: '100%' }}></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Applying Prophet model</span>
+                  <span>75%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full" style={{ width: '75%' }}></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Calculating confidence intervals</span>
+                  <span>20%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full" style={{ width: '20%' }}></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Formatting results</span>
+                  <span>Pending</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-primary h-1.5 rounded-full" style={{ width: '0%' }}></div>
+                </div>
+              </div>
+            </div>
+          </GlassMorphCard>
+        </div>
+      )}
+      
+      {forecastReady && (
+        <AIAnnotation title="AI-Generated Forecast">
+          <GlassMorphCard className="mb-6" hover={false}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Forecast Results</h3>
+              <div className="flex items-center space-x-2">
+                <button className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                  <Download size={18} />
+                </button>
+                <button className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                  <BarChart3 size={18} />
+                </button>
+              </div>
             </div>
             
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecast Demand</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Potential Stockout</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suggested Order</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Forecast ({horizon} days)</th>
+                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">95% CI Low</th>
+                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">95% CI High</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sampleForecastData.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.sku}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{item.name}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{item.forecast}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.confidence}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm">
-                        {item.stockout !== 'None' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            <AlertTriangle size={12} className="mr-1" />
-                            {item.stockout}
-                          </span>
-                        ) : (
-                          'None'
-                        )}
+                  {forecastData.map((item, index) => (
+                    <tr key={item.sku} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{item.sku}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">{item.product}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm text-right font-medium text-gray-900">{item.forecast.toLocaleString()}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm text-right text-gray-500">{item.lower.toLocaleString()}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm text-right text-gray-500">{item.upper.toLocaleString()}</td>
+                      <td className="px-3 py-2 whitespace-nowrap text-sm">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                          ${item.confidence === 'High' ? 'bg-green-100 text-green-800' : 
+                            item.confidence === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'}`}>
+                          {item.confidence}
+                        </span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.suggested}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             
-            <div className="mt-6 flex justify-between items-center">
-              <div className="text-sm text-gray-500">
-                Showing 5 of 5 products • Generated on {new Date().toLocaleDateString()}
+            <div className="flex items-center mt-4 bg-green-50 p-3 rounded-lg">
+              <Sparkles size={18} className="text-green-600 mr-2" />
+              <div className="text-sm text-green-700">
+                <p className="font-medium">AI Insights</p>
+                <p>Based on your data, we've identified a strong seasonal pattern with peak demand expected in 30 days. Consider increasing inventory for SHIRT-001 and BAG-022 as they show the highest growth potential.</p>
               </div>
-              <button className="text-primary underline text-sm" onClick={() => {/* Add logic to view full details */}}>
-                View Full Details
-              </button>
             </div>
-          </div>
-        </motion.div>
+          </GlassMorphCard>
+        </AIAnnotation>
       )}
       
       <div className="flex justify-between">
@@ -231,14 +244,15 @@ const ForecastSetupScreen: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className={`btn-primary ${!forecastGenerated ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={!forecastGenerated}
+          className={`btn-primary ${!forecastReady ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={!forecastReady}
           onClick={handleContinue}
         >
-          Continue to Business Constraints
+          <ArrowRight size={18} className="ml-2 order-2" />
+          <span className="order-1">Continue to Constraints</span>
         </motion.button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

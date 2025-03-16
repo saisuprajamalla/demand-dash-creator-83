@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ChevronUp, Info, CheckCircle, LineChart } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Info, CheckCircle, LineChart, Sparkles, Brain } from 'lucide-react';
 import GlassMorphCard from '../ui/GlassMorphCard';
 import ProgressIndicator from '../ui/ProgressIndicator';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
+import AIAnnotation from '@/components/ui/AIAnnotation';
 
 const steps = ["Onboarding", "Data Source", "Model Selection", "Forecast Setup", "Constraints", "Dashboard"];
 
@@ -74,70 +75,72 @@ const ModelSelectionScreen: React.FC = () => {
   };
 
   return (
-    <div className="container max-w-5xl px-4 py-12 mx-auto">
+    <div className="max-w-full mx-auto">
       <ProgressIndicator steps={steps} currentStep={2} />
       
       <motion.div 
-        className="mb-8 text-center"
+        className="mb-6 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Recommended Forecast Model</h1>
-        <p className="text-lg text-gray-600">We'll automatically select the best model based on your data.</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Recommended Forecast Model</h1>
+        <p className="text-gray-600">We'll automatically select the best model based on your data.</p>
       </motion.div>
       
-      <GlassMorphCard className="mb-8" hover={false}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Auto-Inferred Model</h2>
-          {isAnalyzing ? (
-            <div className="flex items-center">
-              <div className="animate-spin mr-2">
-                <LineChart className="text-primary" size={20} />
+      <AIAnnotation title="AI Model Selection">
+        <GlassMorphCard className="mb-6" hover={false}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Auto-Inferred Model</h2>
+            {isAnalyzing ? (
+              <div className="flex items-center">
+                <div className="animate-spin mr-2">
+                  <LineChart className="text-primary" size={20} />
+                </div>
+                <span className="text-sm">Analyzing data patterns...</span>
               </div>
-              <span className="text-sm">Analyzing data patterns...</span>
+            ) : (
+              <div className="flex items-center text-green-600">
+                <CheckCircle size={20} className="mr-2" />
+                <span className="text-sm font-medium">Analysis complete</span>
+              </div>
+            )}
+          </div>
+          
+          {isAnalyzing ? (
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
             </div>
           ) : (
-            <div className="flex items-center text-green-600">
-              <CheckCircle size={20} className="mr-2" />
-              <span className="text-sm font-medium">Analysis complete</span>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                  <Brain className="text-primary" size={24} />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Prophet is recommended for your data</h3>
+                  <p className="text-gray-600 mb-3 text-sm">
+                    Based on your business type (Apparel) and product lifecycle (Seasonal), 
+                    we recommend Prophet for its ability to handle seasonal patterns.
+                  </p>
+                  
+                  <h4 className="font-medium mb-1 text-sm">Why this model?</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 text-sm">
+                    <li>We detected clear weekly and yearly seasonality in your data</li>
+                    <li>Your data shows multiple trend changepoints that Prophet handles well</li>
+                    <li>You have sufficient historical data (14 months) for accurate forecasting</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
-        </div>
-        
-        {isAnalyzing ? (
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-          </div>
-        ) : (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mr-6">
-                <LineChart className="text-primary" size={28} />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Prophet is recommended for your data</h3>
-                <p className="text-gray-600 mb-4">
-                  Based on your business type (Apparel) and product lifecycle (Seasonal), 
-                  we recommend Prophet for its ability to handle seasonal patterns.
-                </p>
-                
-                <h4 className="font-medium mb-2">Why this model?</h4>
-                <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                  <li>We detected clear weekly and yearly seasonality in your data</li>
-                  <li>Your data shows multiple trend changepoints that Prophet handles well</li>
-                  <li>You have sufficient historical data (14 months) for accurate forecasting</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-      </GlassMorphCard>
+        </GlassMorphCard>
+      </AIAnnotation>
       
-      <div className="mb-8">
+      <div className="mb-6">
         <button 
           className="flex items-center text-primary mb-4"
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -148,7 +151,7 @@ const ModelSelectionScreen: React.FC = () => {
         
         {showAdvanced && (
           <motion.div 
-            className="bg-gray-50 border border-gray-200 rounded-lg p-6"
+            className="bg-gray-50 border border-gray-200 rounded-lg p-4"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             transition={{ duration: 0.3 }}
