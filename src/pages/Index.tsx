@@ -7,6 +7,8 @@ import GlassMorphCard from '@/components/ui/GlassMorphCard';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import AIAnnotation from '@/components/ui/AIAnnotation';
+import { getAIInsights } from '@/utils/googleSheetsHelpers';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -28,37 +30,49 @@ const Index = () => {
     navigate('/data-source');
   };
 
+  // Get AI insights for demo purposes
+  const aiInsights = getAIInsights([]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4">
-      <div className="container max-w-5xl mx-auto py-8">
+    <div className="overflow-y-auto p-4 h-full">
+      <div className="max-w-5xl mx-auto py-4">
         <motion.div 
-          className="text-center mb-12"
+          className="text-center mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Google Sheets Demand Forecasting Add-On</h1>
-          <p className="text-lg text-gray-600">Welcome to your intelligent demand forecasting assistant</p>
+          <h1 className="text-2xl font-bold tracking-tight mb-1">AI-Powered Demand Forecasting</h1>
+          <p className="text-sm text-gray-600">Connect your data and generate accurate forecasts</p>
         </motion.div>
+
+        <AIAnnotation title="AI Assistant">
+          <p className="text-sm mb-2">Based on your sheet data, I recommend starting with these insights:</p>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            {aiInsights.map((insight, index) => (
+              <li key={index}>{insight}</li>
+            ))}
+          </ul>
+        </AIAnnotation>
 
         <motion.div
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
         >
           <motion.div variants={staggerItem}>
             <GlassMorphCard 
               className="h-full"
-              onClick={() => handleCardClick('/data-insights')}
+              onClick={() => handleCardClick('/data-source')}
             >
-              <div className="flex flex-col items-center text-center h-full">
-                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
-                  <BarChart3 size={28} />
+              <div className="flex flex-col items-center text-center h-full p-4">
+                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3">
+                  <BarChart3 size={20} />
                 </div>
-                <h3 className="text-xl font-medium mb-3">Data Insights</h3>
-                <p className="text-gray-600">
-                  Explore your sales and inventory data to identify trends and patterns.
+                <h3 className="text-base font-medium mb-2">Data Insights</h3>
+                <p className="text-xs text-gray-600">
+                  Explore your sales and inventory data to identify trends.
                 </p>
               </div>
             </GlassMorphCard>
@@ -69,13 +83,13 @@ const Index = () => {
               className="h-full"
               onClick={() => handleCardClick('/data-source')}
             >
-              <div className="flex flex-col items-center text-center h-full">
-                <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4">
-                  <LineChart size={28} />
+              <div className="flex flex-col items-center text-center h-full p-4">
+                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-3">
+                  <LineChart size={20} />
                 </div>
-                <h3 className="text-xl font-medium mb-3">Demand Forecasting</h3>
-                <p className="text-gray-600">
-                  Generate forecasts for your upcoming periods based on historical data.
+                <h3 className="text-base font-medium mb-2">Demand Forecasting</h3>
+                <p className="text-xs text-gray-600">
+                  Generate AI forecasts based on historical data.
                 </p>
               </div>
             </GlassMorphCard>
@@ -86,28 +100,28 @@ const Index = () => {
               className="h-full"
               onClick={() => handleCardClick('/constraints')}
             >
-              <div className="flex flex-col items-center text-center h-full">
-                <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4">
-                  <ShoppingCart size={28} />
+              <div className="flex flex-col items-center text-center h-full p-4">
+                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-3">
+                  <ShoppingCart size={20} />
                 </div>
-                <h3 className="text-xl font-medium mb-3">Decision Making</h3>
-                <p className="text-gray-600">
-                  Optimize reorder quantities based on forecasts and business constraints.
+                <h3 className="text-base font-medium mb-2">Decision Making</h3>
+                <p className="text-xs text-gray-600">
+                  Optimize inventory based on AI forecasts and constraints.
                 </p>
               </div>
             </GlassMorphCard>
           </motion.div>
         </motion.div>
 
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-6">Business Context</h2>
+        <Card className="mb-6">
+          <CardContent className="pt-4">
+            <h2 className="text-base font-semibold mb-4">Business Context</h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Business Type</label>
                 <select 
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={businessType}
                   onChange={(e) => setBusinessType(e.target.value)}
                 >
@@ -122,12 +136,12 @@ const Index = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Lifecycle</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Product Lifecycle</label>
                 <div className="grid grid-cols-3 gap-2">
                   {['Seasonal', 'Evergreen', 'Short'].map((type) => (
                     <label 
                       key={type}
-                      className={`flex items-center justify-center p-2 border rounded-md cursor-pointer transition-colors ${
+                      className={`flex items-center justify-center p-1.5 text-xs border rounded-md cursor-pointer transition-colors ${
                         productLifecycle === type.toLowerCase() 
                           ? 'bg-blue-50 border-blue-500 text-blue-700' 
                           : 'border-gray-300 hover:bg-gray-50'
@@ -148,29 +162,29 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sales Channel Split (%)</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-700 mb-1">Sales Channel Split (%)</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Online</label>
+                  <label className="block text-xs text-gray-600 mb-1">Online</label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     placeholder="e.g. 60"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     value={salesChannels.online}
                     onChange={(e) => setSalesChannels({...salesChannels, online: e.target.value})}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Offline</label>
+                  <label className="block text-xs text-gray-600 mb-1">Offline</label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     placeholder="e.g. 40"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     value={salesChannels.offline}
                     onChange={(e) => setSalesChannels({...salesChannels, offline: e.target.value})}
                   />
@@ -179,8 +193,8 @@ const Index = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Forecasting Goals</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <label className="block text-xs font-medium text-gray-700 mb-1">Forecasting Goals</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   { id: 'replenishment', label: 'Replenishment' },
                   { id: 'newProduct', label: 'New Product Launch' },
@@ -189,7 +203,7 @@ const Index = () => {
                 ].map((goal) => (
                   <label 
                     key={goal.id}
-                    className={`flex items-center p-3 border rounded-md cursor-pointer transition-colors ${
+                    className={`flex items-center p-2 text-xs border rounded-md cursor-pointer transition-colors ${
                       forecastingGoals[goal.id as keyof typeof forecastingGoals] 
                         ? 'bg-blue-50 border-blue-500 text-blue-700' 
                         : 'border-gray-300 hover:bg-gray-50'
@@ -197,11 +211,11 @@ const Index = () => {
                   >
                     <input
                       type="checkbox"
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="mr-1.5 h-3 w-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       checked={forecastingGoals[goal.id as keyof typeof forecastingGoals]}
                       onChange={(e) => setForecastingGoals({...forecastingGoals, [goal.id]: e.target.checked})}
                     />
-                    <span className="text-sm">{goal.label}</span>
+                    <span className="text-xs">{goal.label}</span>
                   </label>
                 ))}
               </div>
@@ -212,10 +226,11 @@ const Index = () => {
         <div className="flex justify-end">
           <Button 
             onClick={handleContinue}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 text-sm py-1.5 px-3"
+            size="sm"
           >
             Next
-            <ArrowRight size={16} />
+            <ArrowRight size={14} />
           </Button>
         </div>
       </div>
