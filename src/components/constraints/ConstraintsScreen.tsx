@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Refresh, Calendar, AlertTriangle, Info } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Calendar, AlertTriangle, Info } from 'lucide-react';
 import GlassMorphCard from '../ui/GlassMorphCard';
 import ProgressIndicator from '../ui/ProgressIndicator';
 import { pageTransition } from '@/utils/transitions';
@@ -149,13 +149,13 @@ const ConstraintsScreen: React.FC = () => {
                 {isRecalculating ? (
                   <>
                     <div className="animate-spin mr-2">
-                      <Refresh size={18} />
+                      <RefreshCw size={18} />
                     </div>
                     Recalculating...
                   </>
                 ) : (
                   <>
-                    <Refresh size={18} className="mr-2" />
+                    <RefreshCw size={18} className="mr-2" />
                     Apply & Recalculate
                   </>
                 )}
