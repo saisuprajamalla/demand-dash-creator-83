@@ -1,12 +1,18 @@
 
-import React, { ReactNode } from 'react';
-import { Sparkles } from 'lucide-react';
+import React, { ReactNode, useState } from 'react';
+import { Sparkles, X } from 'lucide-react';
 
 interface GoogleSheetsLayoutProps {
   children: ReactNode;
 }
 
 const GoogleSheetsLayout: React.FC<GoogleSheetsLayoutProps> = ({ children }) => {
+  const [showSidebar, setShowSidebar] = useState(true);
+  
+  const handleCloseSidebar = () => {
+    setShowSidebar(false);
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#f8f9fa]">
       {/* Google Sheets-like header */}
@@ -50,29 +56,21 @@ const GoogleSheetsLayout: React.FC<GoogleSheetsLayoutProps> = ({ children }) => 
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sheets cells background */}
-        <div className="flex-1 relative bg-white border-r border-gray-200 overflow-hidden">
-          <div className="absolute inset-0">
-            <div className="grid grid-cols-[repeat(26,minmax(60px,1fr))] w-full h-full">
-              {Array.from({ length: 26 }).map((_, i) => (
-                <div key={`col-${i}`} className="border-r border-gray-200"></div>
-              ))}
-            </div>
-            <div className="grid grid-rows-[repeat(100,24px)] w-full h-full">
-              {Array.from({ length: 100 }).map((_, i) => (
-                <div key={`row-${i}`} className="border-b border-gray-200"></div>
-              ))}
-            </div>
+        {/* Sheets cells with proper grid lines */}
+        <div className="flex-1 relative bg-white border-r border-gray-200 overflow-auto">
+          {/* Fixed corner */}
+          <div className="sticky top-0 left-0 z-20">
+            <div className="w-10 h-6 bg-[#f8f9fa] border-r border-b border-gray-300 flex-shrink-0"></div>
           </div>
           
           {/* Column headers */}
-          <div className="sticky top-0 z-10">
+          <div className="sticky top-0 z-10 flex">
+            <div className="w-10 h-6 bg-[#f8f9fa] border-r border-b border-gray-300 flex-shrink-0"></div>
             <div className="flex">
-              <div className="w-10 h-6 bg-[#f8f9fa] border-r border-b border-gray-200 flex-shrink-0"></div>
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 26 }).map((_, i) => (
                 <div 
                   key={`header-${i}`} 
-                  className="w-24 h-6 bg-[#f8f9fa] border-r border-b border-gray-200 flex items-center justify-center text-xs text-gray-600 flex-shrink-0"
+                  className="w-24 h-6 bg-[#f8f9fa] border-r border-b border-gray-300 flex items-center justify-center text-xs text-gray-600 flex-shrink-0"
                 >
                   {String.fromCharCode(65 + i)}
                 </div>
@@ -80,41 +78,59 @@ const GoogleSheetsLayout: React.FC<GoogleSheetsLayoutProps> = ({ children }) => 
             </div>
           </div>
           
-          {/* Row headers */}
-          <div className="sticky left-0 z-10">
-            <div className="flex flex-col">
-              {Array.from({ length: 20 }).map((_, i) => (
+          {/* Row headers and cells */}
+          <div className="flex">
+            {/* Row headers */}
+            <div className="sticky left-0 z-10">
+              {Array.from({ length: 100 }).map((_, i) => (
                 <div 
                   key={`row-header-${i}`} 
-                  className="w-10 h-6 bg-[#f8f9fa] border-r border-b border-gray-200 flex items-center justify-center text-xs text-gray-600"
+                  className="w-10 h-6 bg-[#f8f9fa] border-r border-b border-gray-300 flex items-center justify-center text-xs text-gray-600"
                 >
                   {i + 1}
+                </div>
+              ))}
+            </div>
+            
+            {/* Cells */}
+            <div>
+              {Array.from({ length: 100 }).map((_, rowIndex) => (
+                <div key={`row-${rowIndex}`} className="flex">
+                  {Array.from({ length: 26 }).map((_, colIndex) => (
+                    <div 
+                      key={`cell-${rowIndex}-${colIndex}`} 
+                      className="w-24 h-6 border-r border-b border-gray-300 hover:bg-blue-50 text-xs"
+                    ></div>
+                  ))}
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Forecasting add-on sidebar */}
-        <div className="w-[550px] bg-white shadow-lg border-l border-gray-200 overflow-y-auto flex flex-col">
-          <div className="p-3 bg-[#f1f3f4] border-b border-gray-200 flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-6 h-6 bg-blue-500 rounded mr-2 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+        {/* Forecasting add-on sidebar with close functionality */}
+        {showSidebar && (
+          <div className="w-[550px] bg-white shadow-lg border-l border-gray-200 flex flex-col overflow-hidden">
+            <div className="p-3 bg-[#f1f3f4] border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-6 h-6 bg-blue-500 rounded mr-2 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-medium">AI-Powered Demand Forecasting</span>
               </div>
-              <span className="font-medium">AI-Powered Demand Forecasting</span>
+              <button 
+                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-200"
+                onClick={handleCloseSidebar}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button className="text-gray-500 hover:text-gray-700">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            
+            <div className="flex-1 overflow-y-auto p-4">
+              {children}
+            </div>
           </div>
-          
-          <div className="flex-1 overflow-y-auto">
-            {children}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
