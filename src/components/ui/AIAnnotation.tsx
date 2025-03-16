@@ -10,7 +10,7 @@ interface AIAnnotationProps {
 
 const AIAnnotation: React.FC<AIAnnotationProps> = ({ 
   children, 
-  title = "featureBox AI" 
+  title = "FeatureBox AI" 
 }) => {
   return (
     <motion.div 

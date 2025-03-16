@@ -42,7 +42,7 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-2xl font-bold tracking-tight mb-1">featureBox AI</h1>
+          <h1 className="text-2xl font-bold tracking-tight mb-1">FeatureBox AI</h1>
           <p className="text-sm text-gray-600">Connect your data and generate accurate forecasts</p>
         </motion.div>
 
