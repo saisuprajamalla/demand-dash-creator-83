@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const OrderOptimizationPanel: React.FC = () => {
   // Sample order optimization data
@@ -35,37 +35,39 @@ const OrderOptimizationPanel: React.FC = () => {
         <CardContent>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={inventoryForecastData}>
+              <LineChart data={inventoryForecastData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Area 
+                <Line 
                   type="monotone" 
                   dataKey="demand" 
-                  stackId="1" 
                   stroke="#6366f1" 
-                  fill="#818cf8" 
+                  strokeWidth={2}
                   name="Forecasted Demand"
+                  dot={{ r: 4 }}
                 />
-                <Area 
+                <Line 
                   type="monotone" 
                   dataKey="optimalInventory" 
-                  stackId="2" 
                   stroke="#10b981" 
-                  fill="#34d399" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
                   name="Optimal Inventory"
+                  dot={{ r: 4 }}
                 />
-                <Area 
+                <Line 
                   type="monotone" 
                   dataKey="currentPlan" 
-                  stackId="3" 
                   stroke="#f59e0b" 
-                  fill="#fbbf24" 
+                  strokeWidth={2}
+                  strokeDasharray="3 3"
                   name="Current Inventory Plan"
+                  dot={{ r: 4 }}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
