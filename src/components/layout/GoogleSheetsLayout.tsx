@@ -1,6 +1,6 @@
 
 import React, { ReactNode, useState } from 'react';
-import { Sparkles, X } from 'lucide-react';
+import { Bot, X } from 'lucide-react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 interface GoogleSheetsLayoutProps {
@@ -122,8 +122,8 @@ const GoogleSheetsLayout: React.FC<GoogleSheetsLayoutProps> = ({ children }) => 
             <div className="h-full bg-white shadow-lg border-l border-gray-200 flex flex-col overflow-hidden">
               <div className="p-3 bg-[#f1f3f4] border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 bg-blue-500 rounded mr-2 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-6 h-6 bg-indigo-500 rounded mr-2 flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-medium">FeatureBox AI</span>
                 </div>

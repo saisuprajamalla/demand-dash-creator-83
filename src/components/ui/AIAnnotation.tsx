@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AIAnnotationProps {
@@ -20,7 +20,7 @@ const AIAnnotation: React.FC<AIAnnotationProps> = ({
       transition={{ duration: 0.3 }}
     >
       <div className="absolute -top-3 left-3 bg-blue-100 px-2 py-0.5 rounded-md flex items-center">
-        <Sparkles className="w-4 h-4 text-blue-500 mr-1" />
+        <Bot className="w-4 h-4 text-indigo-600 mr-1" />
         <span className="text-xs font-medium text-blue-700">{title}</span>
       </div>
       {children}

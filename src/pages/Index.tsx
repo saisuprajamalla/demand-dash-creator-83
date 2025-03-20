@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, LineChart, Beaker, ArrowRight, Sparkles } from 'lucide-react';
+import { BarChart3, LineChart, Beaker, ArrowRight, Bot } from 'lucide-react';
 import GlassMorphCard from '@/components/ui/GlassMorphCard';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,10 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-2xl font-bold tracking-tight mb-1">FeatureBox AI</h1>
+          <h1 className="text-2xl font-bold tracking-tight mb-1 flex items-center justify-center">
+            <Bot className="w-6 h-6 text-indigo-600 mr-2" />
+            FeatureBox AI
+          </h1>
           <p className="text-sm text-gray-600">Connect your data & generate accurate forecasts</p>
         </motion.div>
 
