@@ -10,6 +10,7 @@ import DataSourceScreen from "./components/data/DataSourceScreen";
 import ModelSelectionScreen from "./components/models/ModelSelectionScreen";
 import ForecastSetupScreen from "./components/forecast/ForecastSetupScreen";
 import ConstraintsScreen from "./components/constraints/ConstraintsScreen";
+import DashboardScreen from "./components/dashboard/DashboardScreen";
 import GoogleSheetsLayout from "./components/layout/GoogleSheetsLayout";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/model-selection" element={<ModelSelectionScreen />} />
             <Route path="/forecast-setup" element={<ForecastSetupScreen />} />
             <Route path="/constraints" element={<ConstraintsScreen />} />
+            <Route path="/dashboard" element={<DashboardScreen />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
