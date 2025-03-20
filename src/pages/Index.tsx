@@ -53,6 +53,32 @@ const Index = () => {
               <li>Connect or paste your data, pick a focus (e.g., Demand Forecasting), and let us handle the rest.</li>
               <li>Ready? Follow these quick steps below!</li>
             </ul>
+            
+            <div className="mt-4 border-t pt-3 border-blue-100">
+              <p className="text-sm font-medium mb-2">Follow these steps:</p>
+              <ol className="text-sm list-decimal pl-5 space-y-2">
+                <li>
+                  <span className="font-medium">Connect Your Data:</span>
+                  <p className="text-xs text-gray-600 ml-1">Paste your sales & inventory info on to the current spreadsheet, or link an external source (Shopify, CSV).</p>
+                </li>
+                <li>
+                  <span className="font-medium">Define Business Context:</span>
+                  <p className="text-xs text-gray-600 ml-1">Tell us about your product lifecycle, sales channel split, and forecasting goals.</p>
+                </li>
+                <li>
+                  <span className="font-medium">Generate Forecast:</span>
+                  <p className="text-xs text-gray-600 ml-1">Let the AI model analyze patterns and predict future demand.</p>
+                </li>
+                <li>
+                  <span className="font-medium">Refine Constraints:</span>
+                  <p className="text-xs text-gray-600 ml-1">Adjust safety stock, lead times, promotions, and other parameters.</p>
+                </li>
+                <li>
+                  <span className="font-medium">Review & Optimize:</span>
+                  <p className="text-xs text-gray-600 ml-1">See recommended order quantities, stock alerts, and final insights—then export or finalize!</p>
+                </li>
+              </ol>
+            </div>
           </div>
         </AIAnnotation>
 
