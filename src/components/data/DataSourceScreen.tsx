@@ -2,18 +2,64 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Database, Upload, FileSpreadsheet, ShoppingBag, ArrowLeft, Download } from 'lucide-react';
+import { Database, Upload, FileSpreadsheet, ShoppingBag, ArrowLeft, Download, ArrowRight } from 'lucide-react';
 import GlassMorphCard from '../ui/GlassMorphCard';
 import ProgressIndicator from '../ui/ProgressIndicator';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
 import AIAnnotation from '@/components/ui/AIAnnotation';
+import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 const steps = ["Onboarding", "Data Source", "Model Selection", "Forecast Setup", "Constraints", "Dashboard"];
+
+// Define the form schema
+const formSchema = z.object({
+  businessType: z.string().min(1, { message: "Please select a business type" }),
+  productLifecycle: z.string().min(1, { message: "Please select a product lifecycle" }),
+  salesChannels: z.object({
+    online: z.string().refine(val => !val || !isNaN(Number(val)), { message: "Must be a number" }),
+    offline: z.string().refine(val => !val || !isNaN(Number(val)), { message: "Must be a number" }),
+  }),
+  forecastingGoals: z.object({
+    replenishment: z.boolean().default(false),
+    newProduct: z.boolean().default(false),
+    promotions: z.boolean().default(false),
+    seasonality: z.boolean().default(false)
+  })
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 const DataSourceScreen: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Initialize the form
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      businessType: '',
+      productLifecycle: '',
+      salesChannels: {
+        online: '',
+        offline: '',
+      },
+      forecastingGoals: {
+        replenishment: false,
+        newProduct: false,
+        promotions: false,
+        seasonality: false
+      }
+    }
+  });
   
   const handleSourceSelect = (source: string) => {
     setSelectedSource(source);
@@ -32,7 +78,10 @@ const DataSourceScreen: React.FC = () => {
   };
   
   const handleContinue = () => {
-    navigate('/model-selection');
+    form.handleSubmit((data) => {
+      console.log('Form data:', data);
+      navigate('/model-selection');
+    })();
   };
 
   return (
@@ -45,10 +94,162 @@ const DataSourceScreen: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Connect Your Data</h1>
-        <p className="text-gray-600">Choose how you want to import your sales and inventory data.</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Business Context & Data Connection</h1>
+        <p className="text-gray-600">Tell us about your business and connect your data source.</p>
       </motion.div>
       
+      <Form {...form}>
+        <form>
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <h2 className="text-base font-semibold mb-4">Business Context</h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <FormField
+                  control={form.control}
+                  name="businessType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium text-gray-700">Business Type</FormLabel>
+                      <select 
+                        className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        {...field}
+                      >
+                        <option value="">Select Type</option>
+                        <option value="apparel">Apparel</option>
+                        <option value="beauty">Beauty</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="homeGoods">Home Goods</option>
+                        <option value="food">Food & Beverage</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="productLifecycle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium text-gray-700">Product Lifecycle</FormLabel>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="grid grid-cols-3 gap-2"
+                      >
+                        {['Seasonal', 'Evergreen', 'Short'].map((type) => (
+                          <FormItem key={type} className="flex items-center space-x-0">
+                            <label 
+                              className={`flex items-center justify-center p-1.5 text-xs border rounded-md cursor-pointer transition-colors w-full ${
+                                field.value === type.toLowerCase() 
+                                  ? 'bg-blue-50 border-blue-500 text-blue-700' 
+                                  : 'border-gray-300 hover:bg-gray-50'
+                              }`}
+                            >
+                              <FormControl>
+                                <RadioGroupItem
+                                  value={type.toLowerCase()}
+                                  className="sr-only"
+                                />
+                              </FormControl>
+                              <span>{type}</span>
+                            </label>
+                          </FormItem>
+                        ))}
+                      </RadioGroup>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="mb-4">
+                <FormLabel className="block text-xs font-medium text-gray-700 mb-1">Sales Channel Split (%)</FormLabel>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="salesChannels.online"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-xs text-gray-600 mb-1">Online</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            placeholder="e.g. 60"
+                            className="w-full p-1.5 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="salesChannels.offline"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-xs text-gray-600 mb-1">Offline</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            placeholder="e.g. 40"
+                            className="w-full p-1.5 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <FormLabel className="block text-xs font-medium text-gray-700 mb-1">Forecasting Goals</FormLabel>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: 'replenishment', label: 'Replenishment' },
+                    { id: 'newProduct', label: 'New Product Launch' },
+                    { id: 'promotions', label: 'Promotions' },
+                    { id: 'seasonality', label: 'Seasonality' }
+                  ].map((goal) => (
+                    <FormField
+                      key={goal.id}
+                      control={form.control}
+                      name={`forecastingGoals.${goal.id}` as any}
+                      render={({ field }) => (
+                        <FormItem>
+                          <label 
+                            className={`flex items-center p-2 text-xs border rounded-md cursor-pointer transition-colors ${
+                              field.value 
+                                ? 'bg-blue-50 border-blue-500 text-blue-700' 
+                                : 'border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="mr-1.5 h-3 w-3"
+                              />
+                            </FormControl>
+                            <span className="text-xs">{goal.label}</span>
+                          </label>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
+      </Form>
+      
+      <h2 className="text-lg font-semibold mb-4">Connect Your Data</h2>
       <motion.div 
         className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
         variants={staggerContainer}
@@ -60,7 +261,7 @@ const DataSourceScreen: React.FC = () => {
             className={`h-full ${selectedSource === 'sheets' ? 'ring-2 ring-primary' : ''}`}
             onClick={() => handleSourceSelect('sheets')}
           >
-            <div className="flex flex-col items-center text-center h-full">
+            <div className="flex flex-col items-center text-center h-full p-4">
               <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-3">
                 <FileSpreadsheet size={24} />
               </div>
@@ -83,7 +284,7 @@ const DataSourceScreen: React.FC = () => {
             onClick={() => {}}
             hover={false}
           >
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full p-4">
               <div className="flex flex-col items-center text-center mb-4">
                 <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3">
                   <Database size={24} />
@@ -158,51 +359,39 @@ const DataSourceScreen: React.FC = () => {
         </motion.div>
       </motion.div>
       
-      <AIAnnotation title="AI Data Structure Analysis">
-        <GlassMorphCard className="mb-6" hover={false}>
-          <div className="flex items-start">
-            <div className="flex-shrink-0 mr-3">
-              <Download size={20} className="text-primary" />
-            </div>
-            <div>
-              <h3 className="text-base font-medium mb-2">Optimal Data Structure</h3>
-              <p className="text-gray-600 mb-3 text-sm">
-                Our AI will analyze your data to identify patterns and seasonality. For best results, include these columns:
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                {['SKU', 'Product Name', 'Category', 'Price', 'Cost', 'Daily Sales', 'Lead Time', 'Min Stock'].map((column) => (
-                  <div key={column} className="bg-gray-100 px-2 py-1 rounded-md text-xs">{column}</div>
-                ))}
-              </div>
-              <button className="inline-flex items-center px-3 py-1.5 border border-primary text-primary rounded-md hover:bg-primary/5 transition-colors text-sm">
-                <Download size={16} className="mr-1.5" />
-                Download Template
-              </button>
-            </div>
+      <AIAnnotation title="Data Structure Information">
+        <div className="space-y-2">
+          <p className="text-sm">We'll automatically interpret your columns (SKU, sales, inventory) once data is connected.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+            {['SKU', 'Product Name', 'Category', 'Price', 'Cost', 'Daily Sales', 'Lead Time', 'Min Stock'].map((column) => (
+              <div key={column} className="bg-gray-100 px-2 py-1 rounded-md text-xs">{column}</div>
+            ))}
           </div>
-        </GlassMorphCard>
+          <button className="inline-flex items-center px-3 py-1.5 border border-primary text-primary rounded-md hover:bg-primary/5 transition-colors text-sm">
+            <Download size={16} className="mr-1.5" />
+            Download Template
+          </button>
+        </div>
       </AIAnnotation>
       
-      <div className="flex justify-between mt-4">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="btn-outline flex items-center"
+      <div className="flex justify-between mt-6">
+        <Button
+          variant="outline"
           onClick={handleBack}
+          className="flex items-center gap-1"
         >
-          <ArrowLeft size={18} className="mr-2" />
+          <ArrowLeft size={16} />
           Back
-        </motion.button>
+        </Button>
         
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={`btn-primary ${!selectedSource ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={!selectedSource}
+        <Button
           onClick={handleContinue}
+          className="flex items-center gap-1"
+          disabled={!selectedSource}
         >
-          Continue to Model Selection
-        </motion.button>
+          Next
+          <ArrowRight size={16} />
+        </Button>
       </div>
     </div>
   );
