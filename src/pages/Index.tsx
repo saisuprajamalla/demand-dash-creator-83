@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, LineChart, ShoppingCart, ArrowRight } from 'lucide-react';
+import { BarChart3, LineChart, Beaker, ArrowRight, Sparkles } from 'lucide-react';
 import GlassMorphCard from '@/components/ui/GlassMorphCard';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
 import { Button } from '@/components/ui/button';
@@ -35,31 +35,32 @@ const Index = () => {
 
   return (
     <div className="overflow-y-auto p-4 h-full">
-      <div className="max-w-5xl mx-auto py-4">
+      <div className="max-w-4xl mx-auto">
         <motion.div 
-          className="text-center mb-8"
+          className="text-center mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-2xl font-bold tracking-tight mb-1">FeatureBox AI</h1>
-          <p className="text-sm text-gray-600">Connect your data and generate accurate forecasts</p>
+          <p className="text-sm text-gray-600">Connect your data & generate accurate forecasts</p>
         </motion.div>
 
         <AIAnnotation title="AI Assistant">
-          <p className="text-sm mb-2">Based on your sheet data, I recommend starting with these insights:</p>
-          <ul className="text-sm list-disc pl-5 space-y-1">
-            {aiInsights.map((insight, index) => (
-              <li key={index}>{insight}</li>
-            ))}
-          </ul>
+          <div className="space-y-2">
+            <p className="text-sm">Welcome to FeatureBox AI—your smart inventory planning assistant.</p>
+            <ul className="text-sm list-disc pl-5 space-y-1">
+              <li>Connect or paste your data, pick a focus (e.g., Demand Forecasting), and let us handle the rest.</li>
+              <li>Ready? Follow these quick steps below!</li>
+            </ul>
+          </div>
         </AIAnnotation>
 
         <motion.div
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
         >
           <motion.div variants={staggerItem}>
             <GlassMorphCard 
@@ -72,7 +73,7 @@ const Index = () => {
                 </div>
                 <h3 className="text-base font-medium mb-2">Data Insights</h3>
                 <p className="text-xs text-gray-600">
-                  Explore your sales and inventory data to identify trends.
+                  Explore your sales & inventory to spot patterns.
                 </p>
               </div>
             </GlassMorphCard>
@@ -89,7 +90,7 @@ const Index = () => {
                 </div>
                 <h3 className="text-base font-medium mb-2">Demand Forecasting</h3>
                 <p className="text-xs text-gray-600">
-                  Generate AI forecasts based on historical data.
+                  Generate AI forecasts from historical data.
                 </p>
               </div>
             </GlassMorphCard>
@@ -102,11 +103,11 @@ const Index = () => {
             >
               <div className="flex flex-col items-center text-center h-full p-4">
                 <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-3">
-                  <ShoppingCart size={20} />
+                  <Beaker size={20} />
                 </div>
-                <h3 className="text-base font-medium mb-2">Decision Making</h3>
+                <h3 className="text-base font-medium mb-2">Scenario Analysis</h3>
                 <p className="text-xs text-gray-600">
-                  Optimize inventory based on AI forecasts and constraints.
+                  Test "what-if" constraints or promotions.
                 </p>
               </div>
             </GlassMorphCard>
