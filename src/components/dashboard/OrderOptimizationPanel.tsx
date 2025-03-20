@@ -45,24 +45,24 @@ const OrderOptimizationPanel: React.FC = () => {
                   type="monotone" 
                   dataKey="demand" 
                   stackId="1" 
-                  stroke="#8884d8" 
-                  fill="#8884d8" 
+                  stroke="#9b87f5" 
+                  fill="#9b87f5" 
                   name="Forecasted Demand"
                 />
                 <Area 
                   type="monotone" 
                   dataKey="optimalInventory" 
                   stackId="2" 
-                  stroke="#82ca9d" 
-                  fill="#82ca9d" 
+                  stroke="#22c55e" 
+                  fill="#22c55e" 
                   name="Optimal Inventory"
                 />
                 <Area 
                   type="monotone" 
                   dataKey="currentPlan" 
                   stackId="3" 
-                  stroke="#ffc658" 
-                  fill="#ffc658" 
+                  stroke="#f59e0b" 
+                  fill="#f59e0b" 
                   name="Current Inventory Plan"
                 />
               </AreaChart>
@@ -90,9 +90,9 @@ const OrderOptimizationPanel: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="stockoutRisk" name="Stockout Risk (%)" fill="#ef4444" />
-                <Bar dataKey="overstockRisk" name="Overstock Risk (%)" fill="#f97316" />
-                <Bar dataKey="potential" name="Service Level (%)" fill="#22c55e" />
+                <Bar dataKey="stockoutRisk" name="Stockout Risk (%)" fill="#dc2626" />
+                <Bar dataKey="overstockRisk" name="Overstock Risk (%)" fill="#ea580c" />
+                <Bar dataKey="potential" name="Service Level (%)" fill="#16a34a" />
               </BarChart>
             </ResponsiveContainer>
           </div>

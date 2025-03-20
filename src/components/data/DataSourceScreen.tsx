@@ -8,13 +8,27 @@ import ProgressIndicator from '../ui/ProgressIndicator';
 import { staggerContainer, staggerItem } from '@/utils/transitions';
 import AIAnnotation from '@/components/ui/AIAnnotation';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 const steps = ["Onboarding", "Data Source", "Model Selection", "Forecast Setup", "Constraints", "Dashboard"];
+const routes = ["/", "/data-source", "/model-selection", "/forecast-setup", "/constraints", "/dashboard"];
 
 const DataSourceScreen: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Business context state
+  const [businessType, setBusinessType] = useState('');
+  const [productLifecycle, setProductLifecycle] = useState('');
+  const [salesChannels, setSalesChannels] = useState({ online: '', offline: '' });
+  const [forecastingGoals, setForecastingGoals] = useState({
+    replenishment: false,
+    newProduct: false,
+    promotions: false,
+    seasonality: false
+  });
   
   const handleSourceSelect = (source: string) => {
     setSelectedSource(source);
@@ -38,7 +52,7 @@ const DataSourceScreen: React.FC = () => {
 
   return (
     <div className="max-w-full mx-auto">
-      <ProgressIndicator steps={steps} currentStep={1} />
+      <ProgressIndicator steps={steps} currentStep={1} routes={routes} />
       
       <motion.div 
         className="mb-6 text-center"
@@ -49,6 +63,116 @@ const DataSourceScreen: React.FC = () => {
         <h1 className="text-2xl font-bold tracking-tight mb-2">Data Connection</h1>
         <p className="text-gray-600">Connect your data source to generate accurate forecasts.</p>
       </motion.div>
+      
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-lg font-semibold mb-4">Business Context</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Business Type</label>
+              <select 
+                className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                value={businessType}
+                onChange={(e) => setBusinessType(e.target.value)}
+              >
+                <option value="">Select Type</option>
+                <option value="apparel">Apparel</option>
+                <option value="beauty">Beauty</option>
+                <option value="electronics">Electronics</option>
+                <option value="homeGoods">Home Goods</option>
+                <option value="food">Food & Beverage</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Product Lifecycle</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['Seasonal', 'Evergreen', 'Short'].map((type) => (
+                  <label 
+                    key={type}
+                    className={`flex items-center justify-center p-1.5 text-xs border rounded-md cursor-pointer transition-colors ${
+                      productLifecycle === type.toLowerCase() 
+                        ? 'bg-blue-50 border-blue-500 text-blue-700' 
+                        : 'border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      className="sr-only"
+                      name="productLifecycle"
+                      value={type.toLowerCase()}
+                      checked={productLifecycle === type.toLowerCase()}
+                      onChange={(e) => setProductLifecycle(e.target.value)}
+                    />
+                    <span>{type}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-700 mb-1">Sales Channel Split (%)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Online</label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="e.g. 60"
+                  className="w-full p-1.5 text-sm"
+                  value={salesChannels.online}
+                  onChange={(e) => setSalesChannels({...salesChannels, online: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Offline</label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="e.g. 40"
+                  className="w-full p-1.5 text-sm"
+                  value={salesChannels.offline}
+                  onChange={(e) => setSalesChannels({...salesChannels, offline: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Forecasting Goals</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { id: 'replenishment', label: 'Replenishment' },
+                { id: 'newProduct', label: 'New Product Launch' },
+                { id: 'promotions', label: 'Promotions' },
+                { id: 'seasonality', label: 'Seasonality' }
+              ].map((goal) => (
+                <label 
+                  key={goal.id}
+                  className={`flex items-center p-2 text-xs border rounded-md cursor-pointer transition-colors ${
+                    forecastingGoals[goal.id as keyof typeof forecastingGoals] 
+                      ? 'bg-blue-50 border-blue-500 text-blue-700' 
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="mr-1.5 h-3 w-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={forecastingGoals[goal.id as keyof typeof forecastingGoals]}
+                    onChange={(e) => setForecastingGoals({...forecastingGoals, [goal.id]: e.target.checked})}
+                  />
+                  <span className="text-xs">{goal.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
       <h2 className="text-lg font-semibold mb-4">Connect Your Data</h2>
       <motion.div 
