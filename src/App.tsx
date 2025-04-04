@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import OnboardingScreen from "./components/onboarding/OnboardingScreen";
@@ -14,7 +14,14 @@ import ConstraintsScreen from "./components/constraints/ConstraintsScreen";
 import DashboardScreen from "./components/dashboard/DashboardScreen";
 import GoogleSheetsLayout from "./components/layout/GoogleSheetsLayout";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,7 +38,7 @@ const App = () => (
             <Route path="/forecast-setup" element={<ForecastSetupScreen />} />
             <Route path="/constraints" element={<ConstraintsScreen />} />
             <Route path="/dashboard" element={<DashboardScreen />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Fallback route for unknown paths */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </GoogleSheetsLayout>
